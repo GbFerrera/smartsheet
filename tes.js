@@ -74,26 +74,14 @@ app.post('/webhook', async (req, res) => {
     return;
   }
 
-  // Verifica se há eventos de criação de nova linha
-  const newRowEvents = req.body.events.filter(event => event.objectType === 'row' && event.eventType === 'created');
-
-  if (newRowEvents.length > 0) {
-    try {
-      // Encaminha os dados relevantes para o webhook do Jimmy Chat
-      const response = await axios.post(jimmyWebhookUrl, {
-        event: 'new_row_created',
-        data: newRowEvents
-      });
-      
-      console.log('Notificação encaminhada com sucesso para o Jimmy Chat:', response.data);
-      res.status(200).send('Notificação encaminhada com sucesso para o Jimmy Chat');
-    } catch (error) {
-      console.error('Erro ao encaminhar notificação para o Jimmy Chat:', error.response ? error.response.data : error.message);
-      res.status(500).send('Erro ao encaminhar notificação para o Jimmy Chat');
-    }
-  } else {
-    console.log('Nenhum evento de criação de nova linha encontrado.');
-    res.status(200).send('Nenhum evento de criação de nova linha encontrado.');
+  // Encaminha os dados recebidos para o webhook do Jimmy Chat
+  try {
+    const response = await axios.post(jimmyWebhookUrl, req.body);
+    console.log('Notificação encaminhada com sucesso para o Jimmy Chat:', response.data);
+    res.status(200).send('Notificação encaminhada com sucesso para o Jimmy Chat');
+  } catch (error) {
+    console.error('Erro ao encaminhar notificação para o Jimmy Chat:', error.response ? error.response.data : error.message);
+    res.status(500).send('Erro ao encaminhar notificação para o Jimmy Chat');
   }
 });
 
