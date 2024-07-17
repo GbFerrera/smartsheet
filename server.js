@@ -39,6 +39,12 @@ async function createAndActivateWebhook() {
     });
 
     console.log('Webhook ativado com sucesso:', activateResponse.data);
+
+
+    const verifyWebhook = await smartsheet.get(`/webhooks/${webhookId}`);
+
+    console.log('Webhook:', verifyWebhook.data);
+
   } catch (error) {
     console.error('Erro ao criar ou ativar o webhook:', error.response ? error.response.data : error.message);
   }
