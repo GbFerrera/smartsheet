@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 
 const app = express();
-app.use(express.json());
+app.use(bodyParser.json());
 
 const apiToken = '89V4QZvoNw2lFKwnBoqCQqOwYybRKz8LmQF4a'; // Substitua com seu token de API do Smartsheet
 const sheetId = '4037790098476932'; // Substitua com o ID da sua planilha no Smartsheet
@@ -17,10 +17,11 @@ const smartsheet = axios.create({
   }
 });
 
-// Função para criar um webhook no Smartsheet
-async function createWebhook() {
+// Função para criar e ativar um webhook no Smartsheet
+async function createAndActivateWebhook() {
   try {
-    const response = await smartsheet.post('/webhooks', {
+    // Criar o webhook
+    const createResponse = await smartsheet.post('/webhooks', {
       name: 'jimmy',
       callbackUrl: 'https://smartsheet.onrender.com/webhook', 
       scope: 'sheet',
@@ -29,9 +30,14 @@ async function createWebhook() {
       version: 1
     });
 
-    console.log('Webhook criado com sucesso:', response.data);
+    const webhookId = createResponse.data.result.id;
+    console.log('Webhook criado com sucesso:', createResponse.data);
+
+    // Ativar o webhook
+    const activateResponse = await smartsheet.put(`/webhooks/${webhookId}/enable`);
+    console.log('Webhook ativado com sucesso:', activateResponse.data);
   } catch (error) {
-    console.error('Erro ao criar o webhook:', error.response ? error.response.data : error.message);
+    console.error('Erro ao criar ou ativar o webhook:', error.response ? error.response.data : error.message);
   }
 }
 
@@ -54,6 +60,6 @@ app.post('/webhook', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor rodando na porta ${PORT}`);
-  // Chamar a função para criar o webhook no Smartsheet quando o servidor iniciar
-  createWebhook();
+  // Chamar a função para criar e ativar o webhook no Smartsheet quando o servidor iniciar
+  createAndActivateWebhook();
 });
