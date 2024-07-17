@@ -48,6 +48,12 @@ async function createAndActivateWebhook() {
 app.post('/webhook', async (req, res) => {
   console.log('Notificação de webhook do Smartsheet recebida:', req.body);
 
+  if (req.body.challenge) {
+    // Responder ao desafio de validação do webhook
+    res.status(200).send({ challenge: req.body.challenge });
+    return;
+  }
+
   // Encaminha os dados recebidos para o webhook do Jimmy Chat
   try {
     const response = await axios.post(jimmyWebhookUrl, req.body);
