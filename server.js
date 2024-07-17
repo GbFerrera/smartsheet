@@ -1,6 +1,9 @@
+// server.js
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const { getRowDetails } = require('./rowDetails'); // Importar a função corretamente
 
 const app = express();
 app.use(bodyParser.json());
@@ -63,20 +66,6 @@ async function createAndActivateWebhook(callbackUrl) {
   }
 }
 
-// Função para obter os detalhes de uma linha pelo ID
-async function getRowDetails(rowId) {
-  try {
-    const response = await smartsheet.get(`/sheets/${sheetId}/rows/${rowId}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Erro ao obter detalhes da linha ${rowId}:`, error.response ? error.response.data : error.message);
-    throw error;
-  }
-}
-
-// Importar a função getRowDetails do seu arquivo row-details.js
-const { getRowDetails } = require('./rowDetails');
-
 // Rota para receber notificações de webhook do Smartsheet
 app.post('/webhook', async (req, res) => {
   console.log('Notificação de webhook do Smartsheet recebida:', req.body);
@@ -95,7 +84,7 @@ app.post('/webhook', async (req, res) => {
     try {
       // Obter os detalhes da primeira linha criada (supondo apenas um evento por vez)
       const rowId = newRowEvents[0].id;
-      const rowDetails = await getRowDetails(rowId);
+      const rowDetails = await getRowDetails(rowId); // Utiliza a função importada corretamente
 
       // Enviar os dados completos para o webhook do Jimmy Chat
       const response = await axios.post(jimmyWebhookUrl, {
