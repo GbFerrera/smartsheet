@@ -51,7 +51,7 @@ app.post('/webhook', async (req, res) => {
 });
 
 // Iniciar o servidor
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
   // Chamar a função para criar o webhook no Smartsheet quando o servidor iniciar
