@@ -63,6 +63,17 @@ async function createAndActivateWebhook(callbackUrl) {
   }
 }
 
+// Função para obter os detalhes de uma linha pelo ID
+async function getRowDetails(rowId) {
+  try {
+    const response = await smartsheet.get(`/sheets/${sheetId}/rows/${rowId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao obter detalhes da linha ${rowId}:`, error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+
 // Rota para receber notificações de webhook do Smartsheet
 app.post('/webhook', async (req, res) => {
   console.log('Notificação de webhook do Smartsheet recebida:', req.body);
@@ -74,14 +85,33 @@ app.post('/webhook', async (req, res) => {
     return;
   }
 
-  // Encaminha os dados recebidos para o webhook do Jimmy Chat
-  try {
-    const response = await axios.post(jimmyWebhookUrl, req.body);
-    console.log('Notificação encaminhada com sucesso para o Jimmy Chat:', response.data);
-    res.status(200).send('Notificação encaminhada com sucesso para o Jimmy Chat');
-  } catch (error) {
-    console.error('Erro ao encaminhar notificação para o Jimmy Chat:', error.response ? error.response.data : error.message);
-    res.status(500).send('Erro ao encaminhar notificação para o Jimmy Chat');
+  // Verifica se há eventos de criação de nova linha
+  const newRowEvents = req.body.events.filter(event => event.objectType === 'row' && event.eventType === 'created');
+
+  if (newRowEvents.length > 0) {
+    try {
+      // Obter os detalhes da primeira linha criada (supondo apenas um evento por vez)
+      const rowId = newRowEvents[0].id;
+      const rowDetails = await getRowDetails(rowId);
+
+      // Enviar os dados completos para o webhook do Jimmy Chat
+      const response = await axios.post(jimmyWebhookUrl, {
+        event: 'new_row_created',
+        data: {
+          rowEvent: newRowEvents[0],
+          rowDetails: rowDetails
+        }
+      });
+
+      console.log('Notificação encaminhada com sucesso para o Jimmy Chat:', response.data);
+      res.status(200).send('Notificação encaminhada com sucesso para o Jimmy Chat');
+    } catch (error) {
+      console.error('Erro ao encaminhar notificação para o Jimmy Chat:', error.response ? error.response.data : error.message);
+      res.status(500).send('Erro ao encaminhar notificação para o Jimmy Chat');
+    }
+  } else {
+    console.log('Nenhum evento de criação de nova linha encontrado.');
+    res.status(200).send('Nenhum evento de criação de nova linha encontrado.');
   }
 });
 

@@ -74,6 +74,9 @@ async function getRowDetails(rowId) {
   }
 }
 
+// Importar a função getRowDetails do seu arquivo row-details.js
+const { getRowDetails } = require('./row-details');
+
 // Rota para receber notificações de webhook do Smartsheet
 app.post('/webhook', async (req, res) => {
   console.log('Notificação de webhook do Smartsheet recebida:', req.body);
