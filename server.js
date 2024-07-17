@@ -17,13 +17,25 @@ const smartsheet = axios.create({
   }
 });
 
+// Função para listar todos os webhooks
+async function listWebhooks() {
+  try {
+    const response = await smartsheet.get('/webhooks');
+    console.log('Lista de Webhooks:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao listar os webhooks:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+
 // Função para criar e ativar um webhook no Smartsheet
-async function createAndActivateWebhook() {
+async function createAndActivateWebhook(callbackUrl) {
   try {
     // Criar o webhook
     const createResponse = await smartsheet.post('/webhooks', {
       name: 'jimmy',
-      callbackUrl: 'https://smartsheet.onrender.com/webhook',
+      callbackUrl: callbackUrl,
       scope: 'sheet',
       scopeObjectId: sheetId,
       events: ['*.*'],
@@ -42,10 +54,12 @@ async function createAndActivateWebhook() {
 
     // Verificar o webhook
     const verifyWebhook = await smartsheet.get(`/webhooks/${webhookId}`);
-    console.log('Webhook:', verifyWebhook.data);
+    console.log('Webhook verificado:', verifyWebhook.data);
 
+    return webhookId;
   } catch (error) {
     console.error('Erro ao criar ou ativar o webhook:', error.response ? error.response.data : error.message);
+    throw error;
   }
 }
 
@@ -64,17 +78,35 @@ app.post('/webhook', async (req, res) => {
   try {
     const response = await axios.post(jimmyWebhookUrl, req.body);
     console.log('Notificação encaminhada com sucesso para o Jimmy Chat:', response.data);
+    res.status(200).send('Notificação encaminhada com sucesso para o Jimmy Chat');
   } catch (error) {
     console.error('Erro ao encaminhar notificação para o Jimmy Chat:', error.response ? error.response.data : error.message);
+    res.status(500).send('Erro ao encaminhar notificação para o Jimmy Chat');
   }
+});
 
-  res.status(200).send('OK');
+// Rota para listar todos os webhooks registrados
+app.get('/list-webhooks', async (req, res) => {
+  try {
+    const webhooks = await listWebhooks();
+    res.status(200).json(webhooks);
+  } catch (error) {
+    res.status(500).send('Erro ao listar webhooks');
+  }
 });
 
 // Iniciar o servidor
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-  // Chamar a função para criar e ativar o webhook no Smartsheet quando o servidor iniciar
-  createAndActivateWebhook();
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Servidor iniciado na porta ${port}`);
 });
+
+// Criar e ativar o webhook ao iniciar o servidor
+(async () => {
+  try {
+    const webhookId = await createAndActivateWebhook('https://smartsheet.onrender.com/webhook');
+    console.log(`Webhook criado e ativado com ID: ${webhookId}`);
+  } catch (error) {
+    console.error('Erro ao criar e ativar webhook durante a inicialização:', error);
+  }
+})();
