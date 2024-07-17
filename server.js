@@ -22,7 +22,7 @@ async function createWebhook() {
   try {
     const response = await smartsheet.post('/webhooks', {
       name: 'jimmy',
-      callbackUrl: 'https://smartsheet.onrender.com/webhooks', 
+      callbackUrl: 'https://smartsheet.onrender.com/webhook', 
       scope: 'sheet',
       scopeObjectId: 4037790098476932,
       events: ['*.*'],
