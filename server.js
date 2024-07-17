@@ -21,7 +21,7 @@ const smartsheet = axios.create({
 async function createAndActivateWebhook() {
   try {
     // Criar o webhook
-    const createResponse = await smartsheet.post('/webhook', {
+    const createResponse = await smartsheet.post('/webhooks', {
       name: 'jimmy',
       callbackUrl: 'https://smartsheet.onrender.com/webhook', 
       scope: 'sheet',
@@ -66,7 +66,7 @@ app.post('/webhook', async (req, res) => {
 });
 
 // Iniciar o servidor
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor rodando na porta ${PORT}`);
   // Chamar a função para criar e ativar o webhook no Smartsheet quando o servidor iniciar
