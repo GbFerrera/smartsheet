@@ -63,6 +63,17 @@ async function createAndActivateWebhook(callbackUrl) {
   }
 }
 
+// Função para obter os detalhes de uma linha pelo ID
+async function getRowDetails(rowId) {
+  try {
+    const response = await smartsheet.get(`/sheets/${sheetId}/rows/${rowId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao obter detalhes da linha ${rowId}:`, error.response ? error.response.data : error.message);
+    throw error;
+  }
+}
+
 // Rota para receber notificações de webhook do Smartsheet
 app.post('/webhook', async (req, res) => {
   console.log('Notificação de webhook do Smartsheet recebida:', req.body);
@@ -79,12 +90,19 @@ app.post('/webhook', async (req, res) => {
 
   if (newRowEvents.length > 0) {
     try {
-      // Encaminha os dados relevantes para o webhook do Jimmy Chat
+      // Obter os detalhes da primeira linha criada (supondo apenas um evento por vez)
+      const rowId = newRowEvents[0].id;
+      const rowDetails = await getRowDetails(rowId);
+
+      // Enviar os dados completos para o webhook do Jimmy Chat
       const response = await axios.post(jimmyWebhookUrl, {
         event: 'new_row_created',
-        data: newRowEvents
+        data: {
+          rowEvent: newRowEvents[0],
+          rowDetails: rowDetails
+        }
       });
-      
+
       console.log('Notificação encaminhada com sucesso para o Jimmy Chat:', response.data);
       res.status(200).send('Notificação encaminhada com sucesso para o Jimmy Chat');
     } catch (error) {
