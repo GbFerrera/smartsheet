@@ -1,5 +1,5 @@
 // Função para obter os detalhes de uma linha pelo ID
-export async function getRowDetails(rowId) {
+ async function getRowDetails(rowId) {
   try {
     const response = await smartsheet.get(`/sheets/${sheetId}/rows/${rowId}`);
     const rowData = response.data;
@@ -63,3 +63,6 @@ app.post('/webhook', async (req, res) => {
     res.status(200).send('Nenhum evento de criação de nova linha encontrado.');
   }
 });
+
+
+module.exports = getRowDetails
