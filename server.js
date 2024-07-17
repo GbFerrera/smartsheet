@@ -21,11 +21,11 @@ const smartsheet = axios.create({
 async function createWebhook() {
   try {
     const response = await smartsheet.post('/webhooks', {
-      name: 'Novo Webhook de Linha Adicionada',
-      callbackUrl: 'https://smartsheet-kjvrov08i-gabriels-projects-da8aa137.vercel.app/webhook', // Substitua com o URL público da sua aplicação no Vercel
+      name: 'jimmy',
+      callbackUrl: 'https://smartsheet-git-main-gabriels-projects-da8aa137.vercel.app/', // URL do seu servidor local
       scope: 'sheet',
-      scopeObjectId: sheetId,
-      events: ['ROW_ADDED'],
+      scopeObjectId: 4037790098476932,
+      events: ['*.*'],
       version: 1
     });
 
