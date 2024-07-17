@@ -34,7 +34,10 @@ async function createAndActivateWebhook() {
     console.log('Webhook criado com sucesso:', createResponse.data);
 
     // Ativar o webhook
-    const activateResponse = await smartsheet.put(`/webhooks/${webhookId}/enable`);
+    const activateResponse = await smartsheet.put(`/webhooks/${webhookId}`, {
+      enabled: true
+    });
+
     console.log('Webhook ativado com sucesso:', activateResponse.data);
   } catch (error) {
     console.error('Erro ao criar ou ativar o webhook:', error.response ? error.response.data : error.message);
