@@ -21,7 +21,7 @@ const smartsheet = axios.create({
 async function createAndActivateWebhook() {
   try {
     // Criar o webhook
-    const createResponse = await smartsheet.post('/webhooks', {
+    const createResponse = await smartsheet.post('/webhook', {
       name: 'jimmy',
       callbackUrl: 'https://smartsheet.onrender.com/webhook', 
       scope: 'sheet',
