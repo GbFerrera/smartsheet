@@ -23,7 +23,7 @@ async function createAndActivateWebhook() {
     // Criar o webhook
     const createResponse = await smartsheet.post('/webhooks', {
       name: 'jimmy',
-      callbackUrl: 'https://smartsheet.onrender.com/webhook', 
+      callbackUrl: 'https://smartsheet.onrender.com/webhook',
       scope: 'sheet',
       scopeObjectId: sheetId,
       events: ['*.*'],
@@ -40,9 +40,8 @@ async function createAndActivateWebhook() {
 
     console.log('Webhook ativado com sucesso:', activateResponse.data);
 
-
+    // Verificar o webhook
     const verifyWebhook = await smartsheet.get(`/webhooks/${webhookId}`);
-
     console.log('Webhook:', verifyWebhook.data);
 
   } catch (error) {
@@ -56,6 +55,7 @@ app.post('/webhook', async (req, res) => {
 
   if (req.body.challenge) {
     // Responder ao desafio de validação do webhook
+    res.set('Smartsheet-Hook-Response', req.body.challenge);
     res.status(200).send({ challenge: req.body.challenge });
     return;
   }
