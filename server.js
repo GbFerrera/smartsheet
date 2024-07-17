@@ -5,8 +5,8 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
-const apiToken = '89V4QZvoNw2lFKwnBoqCQqOwYybRKz8LmQF4a';
-const sheetId = '4037790098476932';
+const apiToken = '89V4QZvoNw2lFKwnBoqCQqOwYybRKz8LmQF4a'; // Substitua com seu token de API do Smartsheet
+const sheetId = '4037790098476932'; // Substitua com o ID da sua planilha no Smartsheet
 const jimmyWebhookUrl = 'https://api.jimmy.chat/integration_webhook/in/route/3487147064058400/35b326f2-c5fc-4ab6-ae5a-4bf3129624a4'; // URL do webhook do Jimmy Chat
 
 const smartsheet = axios.create({
@@ -22,7 +22,7 @@ async function createWebhook() {
   try {
     const response = await smartsheet.post('/webhooks', {
       name: 'Novo Webhook de Linha Adicionada',
-      callbackUrl: 'http://localhost:3000/webhook', 
+      callbackUrl: 'https://smartsheet-kjvrov08i-gabriels-projects-da8aa137.vercel.app/webhook', // Substitua com o URL público da sua aplicação no Vercel
       scope: 'sheet',
       scopeObjectId: sheetId,
       events: ['ROW_ADDED'],
