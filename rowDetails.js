@@ -20,15 +20,16 @@ async function getRowDetails(rowId) {
     const rowData = response.data;
 
     // Montar a mensagem com os detalhes da linha
-    let message = `Nova linha:\n`;
+    let message = `📄 Nova linha:\n\n`;
 
     // Percorrer as células (colunas) da linha
     for (const cell of rowData.cells) {
-      const columnName = cell.columnTitle; // Nome da coluna
-      const cellValue = cell.value; // Valor da célula
+      // Obter o título da coluna (se disponível)
+      const columnName = cell.columnTitle || `Coluna ${cell.columnId}`; // Usar o ID da coluna se o título não estiver disponível
+      const cellValue = cell.value || 'Valor não especificado'; // Tratar caso o valor não esteja disponível
 
-      // Adicionar nome e valor da coluna à mensagem
-      message += `${columnName}: ${cellValue}\n`;
+      // Adicionar nome e valor da coluna à mensagem, com quebra de linha
+      message += `🔹 ${columnName}: ${cellValue}\n`;
     }
 
     return message.trim(); // Retornar a mensagem formatada
