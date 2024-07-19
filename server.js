@@ -90,7 +90,6 @@ app.post('/webhook', async (req, res) => {
       const response = await axios.post(jimmyWebhookUrl, {
         event: 'new_row_created',
         data: {
-          rowEvent: newRowEvents[0],
           rowDetails: rowDetails
         }
       });
